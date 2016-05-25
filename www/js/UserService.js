@@ -3,9 +3,9 @@
         .module('twif')
         .factory('UserService', UserService);
 
-    UserService.$inject = ['AWS', '$window'];
+    UserService.$inject = ['AWSClient', '$window'];
 
-    function UserService(AWS, $window) {
+    function UserService(AWSClient, $window) {
         
         var name = 'Austin Williams';
         var email = 'testemail@gmail.com';

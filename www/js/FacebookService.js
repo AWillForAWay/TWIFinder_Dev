@@ -2,8 +2,8 @@
     angular
         .module('twif')
         .service('FacebookService', FacebookService);
-    FacebookService.$inject = ['$q', 'AWSClient'];
-    function FacebookService($q, AWSClient) {
+    FacebookService.$inject = ['$q', 'AWSClient', 'UserService'];
+    function FacebookService($q, AWSClient, UserService) {
         var service = {
             login: login,
             logout: logout
@@ -40,6 +40,9 @@
         }
         
         function login() {
+            if (!window.cordova) {
+                facebookConnectPlugin.browserInit(1024907954257058);
+            }
             facebookConnectPlugin.getLoginStatus(function(response){
                 if(response.status === 'connected') {
                     //user is logged in
@@ -50,7 +53,7 @@
                     var user = UserService.getUser('facebook');
                     
                     if(!user.userId) {
-                        this.getLoginStatus(response.authResponse)
+                        getFBLoginStatus(response.authResponse)
                         .then(function(profileInfo) {
                             UserService.setUser({
                                 authResponse: authResponse,
@@ -79,7 +82,7 @@
             });
         }
         
-        function getLoginStatus(authResponse) {
+        function getFBLoginStatus(authResponse) {
             var info = $q.defer();
             facebookConnectPlugin.api('/me?fields=email,name&access_token=' + authResponse.accessToken, null,
                 function (response) {
