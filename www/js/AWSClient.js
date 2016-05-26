@@ -3,8 +3,8 @@
         .module('twif')
         .service('AWSClient', AWSClient);
     
-    AWSClient.$inject = ['COGNITO_IDENTITY_POOL_ID', 'AWS_ACCOUNT_ID', 'COGNITO_UNAUTH_ROLE_ARN', 'COGNITO_REGION', 'DYNAMODB_REGION_DEV'];
-    function AWSClient(COGNITO_IDENTITY_POOL_ID, AWS_ACCOUNT_ID, COGNITO_UNAUTH_ROLE_ARN, COGNITO_REGION, DYNAMODB_REGION_DEV) {
+    AWSClient.$inject = ['COGNITO_IDENTITY_POOL_ID', 'AWS_ACCOUNT_ID', 'COGNITO_UNAUTH_ROLE_ARN', 'COGNITO_AUTH_ROLE_ARN', 'COGNITO_REGION', 'DYNAMODB_REGION_DEV'];
+    function AWSClient(COGNITO_IDENTITY_POOL_ID, AWS_ACCOUNT_ID, COGNITO_UNAUTH_ROLE_ARN, COGNITO_AUTH_ROLE_ARN, COGNITO_REGION, DYNAMODB_REGION_DEV) {
         
         var creds = new AWS.CognitoIdentityCredentials({
            AccountId: AWS_ACCOUNT_ID,
@@ -27,14 +27,18 @@
         
         return service;
         
-        function updateWithFacebook(token){
-            var awsCreds = AWS.config.credentials;
-            awsCreds.params.RoleArn = 'arn:aws:iam::358315803191:role/Cognito_TWIFinderAuth_Role';
-            awsCreds.params.Logins['graph.facebook.com'] = token;
+        function updateWithFacebook(access_token){
+            var updatedCreds = new AWS.CognitoIdentityCredentials({
+                AccountId: AWS_ACCOUNT_ID,
+                IdentityPoolId: COGNITO_IDENTITY_POOL_ID,
+                RoleArn: COGNITO_AUTH_ROLE_ARN
+            });
+            updatedCreds.params.Logins = {};
+            updatedCreds.params.Logins['graph.facebook.com'] = access_token;
             
-            awsCreds.expired = true;
-            AWS.config.credentials.getId(function(){
-		   		localStorage.setItem('userid', AWS.config.credentials.params.IdentityId);
+            updatedCreds.expired = true;
+            AWS.config.update({
+                credentials: updatedCreds
             });
         }
     }

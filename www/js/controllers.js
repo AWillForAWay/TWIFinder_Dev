@@ -4,13 +4,16 @@ angular.module('twif')
   
 })
 
-.controller('LoginCtrl', ['$scope', 'FacebookService', function($scope, FacebookService) {
+.controller('LoginCtrl', ['$scope', '$ionicLoading', 'FacebookService', 'UserService', function($scope, $ionicLoading, FacebookService, UserService) {
   var vm = this;
   vm.login = login;
   
+  
   function login() {
+    $ionicLoading.show();
     FacebookService.login();
   }
+  
 }])
 
 .controller('ChatsCtrl', function($scope, Chats) {

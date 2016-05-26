@@ -2,8 +2,8 @@
     angular
         .module('twif')
         .service('FacebookService', FacebookService);
-    FacebookService.$inject = ['$q', 'AWSClient', 'UserService'];
-    function FacebookService($q, AWSClient, UserService) {
+    FacebookService.$inject = ['$q', 'AWSClient', 'UserService', '$state', '$ionicLoading', '$ionicPopup'];
+    function FacebookService($q, AWSClient, UserService, $state, $ionicLoading, $ionicPopup) {
         var service = {
             login: login,
             logout: logout
@@ -17,10 +17,10 @@
             }
 
             var authResponse = response.authResponse;
-
+            AWSClient.updateWithFacebook(authResponse.accessToken);
             getFacebookProfileInfo(authResponse)
             .then(function(profileInfo) {
-                // For the purpose of this example I will store user data on local storage
+                //should probably be create user because we are coming from login
                 UserService.setUser({
                     authResponse: authResponse,
                     userID: profileInfo.id,
@@ -28,14 +28,19 @@
                     email: profileInfo.email,
                     picture : "http://graph.facebook.com/" + authResponse.userID + "/picture?type=large"
                 });
-                AWSClient.updateWithFacebook(authResponse.accessToken);
+                $ionicLoading.hide();
+                $state.go('tab.dash');
             }, function(fail){
-            // Fail get profile info
-            console.log('profile info fail', fail);
+                // Fail get profile info
+                console.log('profile info fail', fail);
             });
         }
         
         function fbLoginError(error) {
+            $ionicPopup.show({
+                title: 'Login Error!',
+                template: 'There was an error logging in to Facebook. Please try again. ' + error
+            });
             console.log('fbLoginError', error);
         }
         
@@ -53,16 +58,18 @@
                     var user = UserService.getUser('facebook');
                     
                     if(!user.userId) {
-                        getFBLoginStatus(response.authResponse)
+                        AWSClient.updateWithFacebook(response.authResponse.accessToken);
+                        getFacebookProfileInfo(response.authResponse)
                         .then(function(profileInfo) {
+                            //should probably be get user from db
                             UserService.setUser({
-                                authResponse: authResponse,
                                 userId: profileInfo.id,
                                 name: profileInfo.name,
                                 email: profileInfo.email,
-                                picture : "http://graph.facebook.com/" + success.authResponse.userID + "/picture?type=large"
-                            });
-                            AWSClient.updateWithFacebook(authResponse.accessToken);
+                                picture : "http://graph.facebook.com/" + profileInfo.userID + "/picture?type=large"
+                            });   
+                            $ionicLoading.hide();
+                            $state.go('tab.dash');                         
                         }, function(fail) {
                             console.log('failed to get profile info', fail);
                         });
@@ -82,7 +89,7 @@
             });
         }
         
-        function getFBLoginStatus(authResponse) {
+        function getFacebookProfileInfo(authResponse) {
             var info = $q.defer();
             facebookConnectPlugin.api('/me?fields=email,name&access_token=' + authResponse.accessToken, null,
                 function (response) {
