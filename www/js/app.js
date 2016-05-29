@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('twif', ['ionic', 'twif-constants'])
+angular.module('twif', ['ionic', 'twif-constants', 'ionic.utils'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -38,6 +38,16 @@ angular.module('twif', ['ionic', 'twif-constants'])
     controllerAs: 'vm',
     data: {
         authenticate: false
+    }
+  })
+  
+  .state('prefences', {
+    url: '/prefences',
+    templateUrl: 'templates/prefences.html',
+    controller: 'PreferencesCtrl',
+    controllerAs: 'vm',
+    data: {
+        authenticate: true
     }
   })
   

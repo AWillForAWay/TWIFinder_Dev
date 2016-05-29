@@ -2,8 +2,8 @@
     angular
         .module('twif')
         .service('FacebookService', FacebookService);
-    FacebookService.$inject = ['$q', 'AWSClient', 'UserService', '$state', '$ionicLoading', '$ionicPopup'];
-    function FacebookService($q, AWSClient, UserService, $state, $ionicLoading, $ionicPopup) {
+    FacebookService.$inject = ['$q', 'AWSClient', 'UserService', '$state', '$ionicLoading', '$ionicPopup', '$localstorage'];
+    function FacebookService($q, AWSClient, UserService, $state, $ionicLoading, $ionicPopup, $localstorage) {
         var service = {
             login: login,
             logout: logout
@@ -18,18 +18,14 @@
 
             var authResponse = response.authResponse;
             AWSClient.updateWithFacebook(authResponse.accessToken);
+            
             getFacebookProfileInfo(authResponse)
             .then(function(profileInfo) {
-                //should probably be create user because we are coming from login
-                UserService.setUser({
-                    authResponse: authResponse,
-                    userID: profileInfo.id,
-                    name: profileInfo.name,
-                    email: profileInfo.email,
-                    picture : "http://graph.facebook.com/" + authResponse.userID + "/picture?type=large"
+                UserService.checkIfUserExists({
+                    'userId': profileInfo.id,
+                    'email': profileInfo.email,
+                    'name': profileInfo.name,
                 });
-                $ionicLoading.hide();
-                $state.go('tab.dash');
             }, function(fail){
                 // Fail get profile info
                 console.log('profile info fail', fail);
@@ -61,7 +57,8 @@
                         AWSClient.updateWithFacebook(response.authResponse.accessToken);
                         getFacebookProfileInfo(response.authResponse)
                         .then(function(profileInfo) {
-                            //should probably be get user from db
+                            //We can assume that the user is already in the 
+                            //db if we are connected so we can call setUser
                             UserService.setUser({
                                 userId: profileInfo.id,
                                 name: profileInfo.name,

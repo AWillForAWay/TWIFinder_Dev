@@ -35,10 +35,57 @@ angular.module('twif')
   $scope.chat = Chats.get($stateParams.chatId);
 })
 
+.controller('PreferencesCtrl', ['PREFERENCES', function(PREFERENCES) {
+  var vm = this;
+  var Volunteer_with_Friends = Preferences[0],
+      Volunteer_by_Myself = Preferences[1],
+      Volunteer_with_Others = Preferences[2],
+      Collecting_Items = Preferences[3],
+      Donating_Money = Preferences[4],
+      Attending_Events = Preferences[5];
+  var preferences = [
+    {
+      text: Volunteer_with_Friends,
+      checked: false 
+    },
+    {
+      text: Volunteer_by_Myself,
+      checked: false 
+    },
+    {
+      text: Volunteer_with_Others,
+      checked: false 
+    },
+    {
+      text: Collecting_Items,
+      checked: false 
+    },
+    {
+      text: Donating_Money,
+      checked: false 
+    },
+    {
+      text: Attending_Events,
+      checked: false 
+    }
+  ];
+  
+  vm.savePreference = savePreference;
+  vm.preferences = preferences;
+  
+  function savePreferences(item, checked) {
+    var newItem = item;
+    var check = checked;
+    //update user details with the new value
+
+  }
+  
+}])
+
 .controller('AccountCtrl', ['UserService', function(UserService, AWS) {
   var vm = this;
   
-  function saveCategory(item, checked) {
+  function savePreference(item, checked) {
     var newItem = item;
     var check = checked;
     //update user details with the new value
@@ -49,7 +96,7 @@ angular.module('twif')
     UserService.logout();
   }
   
-  vm.categories = UserService.categories;
+  vm.preferences = UserService.preferences;
   vm.name = UserService.name;
   vm.email = UserService.email;
   vm.categories = UserService.categories;
