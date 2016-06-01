@@ -71,6 +71,10 @@
                             console.log('failed to get profile info', fail);
                         });
                     }
+                    else {
+                        $ionicLoading.hide();
+                        $state.go('tab.dash'); 
+                    }
                 } else {
                     facebookConnectPlugin.login(['email', 'public_profile'], fbLoginSuccess, fbLoginError);
                 }

@@ -9,20 +9,16 @@
         
         var name = 'Austin Williams';
         var email = 'testemail@gmail.com';
-        var preferences = PREFERENCES;
         var service = {
             name: name,
             email: email,
-            preferences: preferences,
+            getPreferencesForUser: getPreferencesForUser,
             logout: logout,
             setUser: setUser,
-            getUser: getUser
+            getUser: getUser,
+            checkIfUserExists: checkIfUserExists
         };
         return service;
-        
-        function logout() {
-            return null;
-        }
         
         function setUser(user_data) {
             $localstorage.setObject('user_data', user_data);
@@ -30,6 +26,34 @@
 
         function getUser() {
             return $localstorage.getObject('user_data');
+        }
+        
+        function getPreferencesForUser(queryParams){
+            var params = {
+                TableName: 'Users',
+                Key: {
+                    UserId: queryParams.userId,
+                    Email: queryParams.email
+                },
+                AttributesToGet: [
+                    'Attending Events',
+                    'Collecting Items',
+                    'Donating Money',
+                    'Volunteer by Myself',
+                    'Volunteer with Friends',
+                    'Volunteer with Others'
+                ]
+                
+            };
+            AWSClient.docClient.get(params, function(err, data) {
+                if(err) {
+                    console.log('error: ' + err);
+                }
+                else {
+                    //TODO: Implement returning this 
+                    console.log('data: ' + data);
+                }
+            });
         }
         
         function checkIfUserExists(queryParams) {
@@ -122,7 +146,16 @@
                     ":c": queryParams.checked
                 },
                 ReturnValues: "UPDATED_NEW"
-            }
+            };
+            
+            docClient.update(params, function(err, data) {
+                if (err) { 
+                    console.log(err);
+                }
+                else { 
+                    console.log(data); 
+                }
+            });
         }
         
     }
