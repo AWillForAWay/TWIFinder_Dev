@@ -6,9 +6,41 @@
     function FacebookService($q, AWSClient, UserService, $state, $ionicLoading, $ionicPopup, $localstorage) {
         var service = {
             login: login,
-            logout: logout
+            logout: logout, 
+            getLoginStatus: getLoginStatus
         };
         return service;
+        
+        function getLoginStatus() {
+            
+            facebookConnectPlugin.getLoginStatus(function(response) {
+                if(response.status === 'connected') {
+                    var user = UserService.getUser('facebook');
+                    
+                    if(!user.userId) {
+                        AWSClient.updateWithFacebook(response.authResponse.accessToken);
+                        getFacebookProfileInfo(response.authResponse)
+                        .then(function(profileInfo) {
+                            //We can assume that the user is already in the 
+                            //db if we are connected so we can call setUser
+                            UserService.setUser({
+                                userId: profileInfo.id,
+                                name: profileInfo.name,
+                                email: profileInfo.email,
+                                picture : "http://graph.facebook.com/" + profileInfo.userID + "/picture?type=large"
+                            });   
+                            $state.go('tab.dash');                         
+                        }, function(fail) {
+                            console.log('failed to get profile info', fail);
+                        });
+                    }
+                    else {
+                        AWSClient.updateWithFacebook(response.authResponse.accessToken);
+                        $state.go('tab.dash'); 
+                    }
+                }
+            });
+        }
 
         function fbLoginSuccess(response) {
             if (!response.authResponse){
@@ -72,6 +104,7 @@
                         });
                     }
                     else {
+                        AWSClient.updateWithFacebook(response.authResponse.accessToken);
                         $ionicLoading.hide();
                         $state.go('tab.dash'); 
                     }

@@ -7,7 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('twif', ['ionic', 'twif-constants', 'ionic.utils'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, FacebookService) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -20,5 +20,10 @@ angular.module('twif', ['ionic', 'twif-constants', 'ionic.utils'])
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+    if (!window.cordova) {
+      facebookConnectPlugin.browserInit(1024907954257058);
+      FacebookService.getLoginStatus();
+    }
+    
   });
 });

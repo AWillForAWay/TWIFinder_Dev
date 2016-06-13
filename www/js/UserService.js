@@ -13,7 +13,6 @@
             name: name,
             email: email,
             getPreferencesForUser: getPreferencesForUser,
-            logout: logout,
             setUser: setUser,
             getUser: getUser,
             checkIfUserExists: checkIfUserExists
@@ -124,7 +123,7 @@
                 }
             };
             
-            AWS.AWS.docClient.get(params, function(err, data){
+            AWSClient.docClient.get(params, function(err, data){
                 if(err) {
                     console.error('Unable to read item. JSON Error:', JSON.stringify(err, null, 2));
                 }

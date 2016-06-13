@@ -28,13 +28,15 @@
                    UserId: UserId,
                    Email: Email
                },
-               UpdateExpression: 'set ' + Volunteer_with_Friends + ':f,'
-                                        + Volunteer_by_Myself + ':m,'
-                                        + Volunteer_with_Others + ':o,'
-                                        + Collecting_Items + ':c,'
-                                        + Donating_Money + ':d,'
-                                        + Attending_Events + ':a',
-               ExpressionAttributeValues:{
+               ExpressionAttributeNames: {
+                   '#f': Volunteer_with_Friends,
+                   '#m': Volunteer_by_Myself,
+                   '#o': Volunteer_with_Others,
+                   '#c': Collecting_Items,
+                   '#d': Donating_Money,
+                   '#a': Attending_Events,
+               },
+               ExpressionAttributeValues: {
                 ':f': params[Volunteer_by_Friends],
                 ':m': params[Volunteer_by_Myself],
                 ':o': params[Volunteer_by_Others],
@@ -42,7 +44,12 @@
                 ':d': params[Donating_Money],
                 ':a': params[Attending_Events],
                },
-               ReturnValues:"UPDATED_NEW"
+               UpdateExpression: 'set #f = :f,'
+                                   + '#m = :m,'
+                                   + '#o = :o,'
+                                   + '#c = :c,'
+                                   + '#d = :d,'
+                                   + '#a = :a'
             };
             AWSClient.docClient.update(queryParams, function (err, data){
                 if (err) {

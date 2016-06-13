@@ -3,24 +3,13 @@
         .module('twif')
         .controller('MatchesController', MatchesController);
     
-    MatchesController.$inject = ['UserService', '$state']; 
+    MatchesController.$inject = ['$state', 'MatchesService']; 
        
-    function MatchesController(FacebookService, UserService, $ionicLoading, $state) {
+    function MatchesController($state, MatchesService) {
         var vm = this;
-        vm.login = login;
-        
-        checkLoginStatus();
-        
-        function checkLoginStatus() {
-            var user = UserService.getUser('facebook');
-            if(user.userId) {
-                $state.go('tab.dash');
-            }
-        }
   
-        function login() {
-            $ionicLoading.show();
-            FacebookService.login();
+        function getMatches() {
+            
         }   
     }
 })();

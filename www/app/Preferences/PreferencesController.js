@@ -1,7 +1,7 @@
 (function() {
     angular
         .module('twif')
-        .controller('PreferencesController', LoginController);
+        .controller('PreferencesController', PreferencesController);
     
     PreferencesController.$inject = ['PREFERENCES', 'PreferencesService', '$ionicPopup']; 
        
